@@ -6,10 +6,13 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from utils.commonUtils import explicitWaiting, verification_code, calculate_code
 
-from utils.driverUtils import FirefoxDriver
 
-
-def login_gain_cookies(driver, username, password, patent_number, status):
+def login_cnipa(driver, username, password):
+    """
+    :param driver: 浏览器驱动对象
+    :param username: 查询网站账号
+    :param password: 查询网站密码
+    """
     driver.get('http://cpquery.cnipa.gov.cn/')
     # 全局等待
     driver.implicitly_wait(40)
@@ -43,21 +46,24 @@ def login_gain_cookies(driver, username, password, patent_number, status):
 
     sleep(0.5)
     #  验证码识别并点击
-    verification_code(driver=driver, image_location='../tempFiles/patent_inquire_login.png')
+    verification_code(driver=driver, image_location='./tempFiles/patent_inquire_login.png')
 
     # 处理验证码点击错误进行重新加载
     while driver.find_element(By.XPATH, '//*[@id="selectyzm_text"]').text != '验证成功':
         element = driver.find_element(By.XPATH, '//*[@class="img_reload"]')
         driver.execute_script("arguments[0].click();", element)
         sleep(1)
-        verification_code(driver, image_location='../tempFiles/patent_inquire_login.png')
+        verification_code(driver, image_location='./tempFiles/patent_inquire_login.png')
     else:
         element = driver.find_element(By.XPATH, '//input[@id="publiclogin"]')
         driver.execute_script("arguments[0].click();", element)
     # 等待登录加载完成
     WebDriverWait(driver, 40).until(EC.text_to_be_present_in_element((By.XPATH, '//*[@class="tittle_box"]'), '使用声明'))
 
-    # 跳过使用声明，进入查询页面
+
+# 获取所查询专利号的cookie和token
+def gain_cnipa_cookies(driver, patent_number, status):
+    # 进入查询页面
     driver.get('http://cpquery.cnipa.gov.cn/txnPantentInfoList.do?')
     # 等待元素加载完成
     explicitWaiting(driver, 20, xpath='//*[@class="tab_top_on"]/p')
@@ -99,7 +105,3 @@ def login_gain_cookies(driver, username, password, patent_number, status):
         for cookies in cookies_list:
             cookie += cookies['name'] + '=' + cookies['value'] + ';'
         return cookie
-
-
-driver = FirefoxDriver()
-login_gain_cookies(driver, username='15156052212', password='Zhixin888*', patent_number='2015108746518', status='')

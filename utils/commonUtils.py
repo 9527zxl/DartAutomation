@@ -54,7 +54,7 @@ def calculate_code(driver):
     :param driver: 浏览器驱动对象
     :return: 计算验证码结果
     """
-    calculate_code_bytes = interceptPicture(driver, image_location='../tempFiles/calculate_code.png',
+    calculate_code_bytes = interceptPicture(driver, image_location='./tempFiles/calculate_code.png',
                                             xpath='//*[@id="authImg"]')
     word = ocr.classification(calculate_code_bytes.getvalue())
     # 对ocr识别后的字符串进行处理
@@ -123,6 +123,11 @@ def verification_code(driver, image_location):
 
 # 登录飞镖网获取cookies
 def login_get_cookies(driver, username, password):
+    """
+    :param driver:  浏览器驱动对象
+    :param username:  飞镖网账号
+    :param password:  飞镖网密码
+    """
     driver.get('http://www.ipfeibiao.com/manager/frame/index')
     driver.maximize_window()
 
@@ -131,7 +136,7 @@ def login_get_cookies(driver, username, password):
     driver.find_element(By.XPATH, "//input[@name='password']").send_keys(password)
 
     # 获取验证码
-    code_byte = interceptPicture(driver, image_location='../tempFiles/feibiao_print_screen.png',
+    code_byte = interceptPicture(driver, image_location='./tempFiles/feibiao_print_screen.png',
                                  xpath='//*[@id="img_captcha"]')
     code = ocr.classification(code_byte.getvalue())
 
@@ -164,7 +169,20 @@ def login_get_cookies(driver, username, password):
     # 获取cookies
     cookies_list = json.dumps(driver.get_cookies())
     # 持久化cookies
-    with open('../tempFiles/feibiao_cookies.json', 'w') as f:
+    with open('./tempFiles/feibiao_cookies.json', 'w') as f:
         f.write(cookies_list)
 
     driver.quit()
+
+
+# 获取飞镖网cookie
+def gain_feibiao_cookie():
+    """
+    :return: 返回飞镖网cookie
+    """
+    with open('../tempFiles/feibiao_cookies.json', 'r') as f:
+        cookies_list = json.load(f)
+        cookie = cookies_list[0]['name'] + '=' + cookies_list[0]['value'] + ';' + cookies_list[1]['name'] + '=' + \
+                 cookies_list[1]['value']
+
+    return cookie
