@@ -11,6 +11,22 @@ def header(feibiao_cookie):
     return headers
 
 
+# 年费状态更新
+def patent_update(feibiao_cookie, update_cookie, update_token):
+    param = {
+        'token': update_token,
+        'host': '49.7.96.252',
+        'port': '16819',
+        'cookie': update_cookie,
+        'app_no_like': '',
+        's_state': ''
+    }
+
+    patent_update_url = 'http://www.ipfeibiao.com/manager/patentUpdateAnnualState/updatePatents'
+
+    requests.post(url=patent_update_url, params=param, headers=header(feibiao_cookie))
+
+
 # 获取年费状态更新专利号
 def get_patent_number(feibiao_cookie):
     param = {
@@ -60,3 +76,23 @@ def get_acquisition_patent_Number(feibiao_cookie, state):
         patent_acquisition.append(id['app_no'])
 
     return patent_acquisition
+
+
+# 系统日志专利状态更新次数
+def update_successfully(feibiao_cookie):
+    """
+    :param feibiao_cookie: 飞镖网cookie值
+    :return: 系统日志专利状态更新次数
+    """
+    param = {
+        'page': 1,
+        'limit': 50,
+        'log_type': '专利状态'
+    }
+
+    url = 'http://www.ipfeibiao.com/manager/sysLog/list'
+
+    response = requests.post(url=url, params=param, headers=header(feibiao_cookie))
+    list_data = response.json()
+
+    return list_data['count']

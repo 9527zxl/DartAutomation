@@ -174,6 +174,8 @@ def login_get_cookies(driver, username, password):
 
     driver.quit()
 
+    return '登录成功'
+
 
 # 获取飞镖网cookie
 def gain_feibiao_cookie():
