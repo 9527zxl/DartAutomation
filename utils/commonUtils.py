@@ -26,6 +26,15 @@ def explicitWaiting(driver, waiting_time: int, xpath: str):
     WebDriverWait(driver, waiting_time).until(EC.presence_of_all_elements_located((By.XPATH, xpath)), message='超时啦!')
 
 
+# 判断元素是否存在
+def element_exist(driver, time, xpath_path):
+    try:
+        WebDriverWait(driver, time).until(EC.presence_of_element_located((By.XPATH, xpath_path)))
+        return True
+    except:
+        return False
+
+
 # 截取验证码
 def interceptPicture(driver, image_location, xpath):
     """
@@ -182,7 +191,7 @@ def gain_feibiao_cookie():
     """
     :return: 返回飞镖网cookie
     """
-    with open('../tempFiles/feibiao_cookies.json', 'r') as f:
+    with open('./tempFiles/feibiao_cookies.json', 'r') as f:
         cookies_list = json.load(f)
         cookie = cookies_list[0]['name'] + '=' + cookies_list[0]['value'] + ';' + cookies_list[1]['name'] + '=' + \
                  cookies_list[1]['value']

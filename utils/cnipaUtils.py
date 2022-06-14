@@ -1,10 +1,11 @@
 import json
 import re
+import sys
 from time import sleep
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from utils.commonUtils import explicitWaiting, verification_code, calculate_code
+from utils.commonUtils import explicitWaiting, verification_code, calculate_code, element_exist
 
 
 def login_cnipa(driver, username, password):
@@ -62,7 +63,7 @@ def login_cnipa(driver, username, password):
 
 
 # 获取所查询专利号的cookie和token
-def gain_cnipa_cookies(driver, patent_number, status):
+def gain_cnipa_cookies(driver, patent_number):
     # 进入查询页面
     driver.get('http://cpquery.cnipa.gov.cn/txnPantentInfoList.do?')
     # 等待元素加载完成
@@ -78,10 +79,12 @@ def gain_cnipa_cookies(driver, patent_number, status):
     # 请求输入过专利号和验证码页面
     driver.get('http://cpquery.cnipa.gov.cn/txnQueryOrdinaryPatents.do?select-key:shenqingh=' + (str(
         patent_number)).replace(' ', '') + '&verycode=' + str(code))
-    # 等待元素加载完成
-    explicitWaiting(driver, 20, xpath='/html/body/div[2]/div[1]/div[2]/div[2]/div/ul/li[1]/a')
+    # 处理查询次数使用完了的场景
+    if element_exist(driver=driver, time=5, xpath_path='/html/body/div/img'):
+        driver.quit()
+        return '查询次数已经耗尽'
     # 处理计算验证码失效或超时处理
-    while not driver.find_element_by_xpath('/html/body/div[2]/div[1]/div[2]/div[2]/div/ul/li[1]/a').is_displayed():
+    while not element_exist(driver=driver, xpath_path='//*[@class="bi_icon"]', time=5):
         code = calculate_code(driver)
         driver.get(
             'http://cpquery.cnipa.gov.cn/txnQueryOrdinaryPatents.do?select-key:shenqingh=' + (str(
@@ -93,15 +96,23 @@ def gain_cnipa_cookies(driver, patent_number, status):
     explicitWaiting(driver, 20, xpath='//*[@id="jbxx"]/p')
 
     # 通过正则获取token
-    if status == 'token':
-        token = re.findall('token=(.*?)&', driver.current_url)
-        return token
+    token = re.findall('token=(.*?)&', driver.current_url)
 
-    # 获取cookie值
+    # 将cookies持久化保存
+    with open('./tempFiles/cookies.json', 'w') as f:
+        # 将cookies保存为json格式
+        f.write(json.dumps(driver.get_cookies()))
+
+    # 返回token值
+    return token[0]
+
+
+# 根据持久化cookies文件获取cookie
+def get_cookies():
     cookie = ''
-    cookies_json = json.dumps(driver.get_cookies())
-    cookies_list = json.loads(cookies_json)
-    if status == 'cookie':
+    with open('./tempFiles/cookies.json', 'r') as f:
+        cookies_list = json.load(f)
         for cookies in cookies_list:
             cookie += cookies['name'] + '=' + cookies['value'] + ';'
-        return cookie
+
+    return cookie
