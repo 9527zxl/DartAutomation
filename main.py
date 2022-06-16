@@ -2,6 +2,7 @@ import os
 import sys
 from time import sleep
 
+from tkinterMain import mainGUi
 from utils.cnipaUtils import login_cnipa, gain_cnipa_cookies, get_cookies
 from utils.commonUtils import gain_feibiao_cookie
 from utils.driverUtils import FirefoxDriver
@@ -38,10 +39,12 @@ def main(driver, feibiaoCookie):
 
 
 if __name__ == '__main__':
-    driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe')
+    # driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe')
     # 登录飞镖网
     # login_get_cookies(driver, username='zhuxingli', password='zhuxingli')
     # 获取飞镖cookie
-    feibiao_cookie = gain_feibiao_cookie()
-    print('飞镖网cookie:' + str(feibiao_cookie))
-    main(driver=driver, feibiaoCookie=feibiao_cookie)
+    # feibiao_cookie = gain_feibiao_cookie()
+    # print('飞镖网cookie:' + str(feibiao_cookie))
+    # main(driver=driver, feibiaoCookie=feibiao_cookie)
+
+    mainGUi()
