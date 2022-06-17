@@ -2,9 +2,8 @@ import os
 import sys
 import tkinter
 import tkinter.messagebox
-from itertools import zip_longest
-from tkinter import RIGHT, Y, scrolledtext, END
-from tkinter.ttk import Entry
+from tkinter import scrolledtext, END, X, HORIZONTAL
+from tkinter.ttk import Separator
 
 from utils.commonUtils import login_get_cookies
 
@@ -52,12 +51,20 @@ def saveGui(account, password):
     account_result.remove('')
     password_result.remove('')
 
+    data = []
+    ss = dict(zip(account_result, password_result))
+    for key, value in ss.items():
+        data.append(key + '       ' + value)
+    # 持久化处理
+    with open('./tempFiles/account.txt', 'w') as f:
+        f.write('\n'.join(data))
+
 
 # 主界面
 def mainGUi():
     main = tkinter.Tk()
     main.title('欢迎您，今天的工作开始了')
-    main.geometry('400x300+500+300')
+    main.geometry('400x400+500+300')
     # 设置图标
     main.iconbitmap('./tempFiles/favicon.ico')
     # 专利查询网标题
@@ -78,12 +85,50 @@ def mainGUi():
     password = scrolledtext.ScrolledText(main, font=('宋体', 14), width=15, height=9)
     password.place(x=200, y=60)
 
+    # 读取账户密码显示出来
+    with open('./tempFiles/account.txt', 'r') as f:
+        data = f.read().split('\n')
+
+    dispose = ','.join(data).split('       ')
+    account_result = []
+    password_result = []
+    for index, value in enumerate(','.join(dispose).split(',')):
+        if index == 0:
+            account_result.append(value)
+        if index % 2 == 0 and index != 0:
+            account_result.append(value)
+        elif index % 2 != 0 and index != 0:
+            password_result.append(value)
+
+    # 显示账户
+    for i in account_result:
+        account.insert(END, i + '\n')
+    # 锁定账户文本框
+    account.configure(state='disabled')
+
+    # 显示密码
+    for i in password_result:
+        password.insert(END, i + '\n')
+    # 锁定密码文本框
+    password.configure(state='disabled')
+
     # 保存按钮
     save = tkinter.Button(main, text='保存', font=('宋体', 11), command=lambda: saveGui(account, password))
-    save.place(x=200, y=250)
+    save.place(x=250, y=250)
     # 修改按钮
     amend = tkinter.Button(main, text='修改', font=('宋体', 11), command=lambda: amendGui(account, password))
-    amend.place(x=50, y=250)
+    amend.place(x=90, y=250)
+
+    # 分割线
+    sep = Separator(main, orient=HORIZONTAL)  # VERTICAL为竖的分割线
+    sep.pack(padx=10, fill=X)
+
+    dd = Separator(main, orient=HORIZONTAL)  # HORIZONTAL建立水平分隔线，VERTICAL建立垂直分隔线
+    dd.pack(fill=X, pady=220)
+
+    # 年费状态更新按钮
+    # annual_fee_status = tkinter.Button(main, text='年费状态更新', font=('宋体', 12))
+    # annual_fee_status.place(x=20, y=290)
 
     main.mainloop()
 
