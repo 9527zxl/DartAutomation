@@ -16,7 +16,7 @@ def login_cnipa(driver, username, password):
     """
     driver.get('http://cpquery.cnipa.gov.cn/')
     # 全局等待
-    driver.implicitly_wait(40)
+    # driver.implicitly_wait(10)
     # 窗口最大化
     driver.maximize_window()
     driver.refresh()
@@ -80,11 +80,11 @@ def gain_cnipa_cookies(driver, patent_number):
     driver.get('http://cpquery.cnipa.gov.cn/txnQueryOrdinaryPatents.do?select-key:shenqingh=' + (str(
         patent_number)).replace(' ', '') + '&verycode=' + str(code))
     # 处理查询次数使用完了的场景
-    if element_exist(driver=driver, time=5, xpath_path='/html/body/div/img'):
+    if element_exist(driver=driver, xpath_path='//*[@class="binding"]/img', time=0):
         driver.quit()
         return '查询次数已经耗尽'
     # 处理计算验证码失效或超时处理
-    while not element_exist(driver=driver, xpath_path='//*[@class="bi_icon"]', time=5):
+    while not element_exist(driver=driver, xpath_path='//*[@class="bi_icon"]', time=0):
         code = calculate_code(driver)
         driver.get(
             'http://cpquery.cnipa.gov.cn/txnQueryOrdinaryPatents.do?select-key:shenqingh=' + (str(
