@@ -10,7 +10,9 @@ from utils.cnipaUtils import login_cnipa, gain_cnipa_cookies, get_cookies
 from utils.commonUtils import gain_feibiao_cookie
 from utils.driverUtils import FirefoxDriver
 from utils.requestsUtils import get_acquisition_patent_Number, annual_fee_to_update, get_patent_number, \
-    update_successfully, patent_update
+    update_successfully, patent_update, annual_update
+
+on_state = True
 
 
 # 年费状态更新按钮
@@ -20,7 +22,8 @@ def Annual_status_update():
     elif password_frame.get() == '':
         tkinter.messagebox.showerror(title='error', message='密码不能为空!')
     elif account_frame.get() != '' and password_frame.get() != '':
-        driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe')
+        driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe',
+                               state=False if condition.get() == 1 else on_state)
         # 获取飞镖cookie
         feibiao_cookie = gain_feibiao_cookie()
         # 登录查询网站
@@ -53,8 +56,12 @@ def Annual_status_update():
             while sleep_state:
                 sleep(30)
                 update_number2 = update_successfully(feibiao_cookie=feibiao_cookie)
+                print('update_number1=' + str(update_number1))
+                print('update_number2=' + str(update_number2))
+                print('等待中。。。')
                 if update_number1 < update_number2:
                     sleep_state = False
+                    break
 
 
 # 年费采集按钮
@@ -64,7 +71,8 @@ def Annual_update_button():
     elif password_frame.get() == '':
         tkinter.messagebox.showerror(title='error', message='密码不能为空!')
     elif account_frame.get() != '' and password_frame.get() != '':
-        driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe')
+        driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe',
+                               state=False if condition.get() == 1 else on_state)
         # 获取飞镖网cookie
         feibiao_cookie = gain_feibiao_cookie()
         # 登录查询网站
@@ -83,8 +91,13 @@ def Annual_update_button():
             cookie = get_cookies()
             # 获取id
             ids = get_acquisition_patent_Number(feibiao_cookie, state=True)
-            # 更新
-            annual_fee_to_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token, ids=ids)
+            # 更新 模式一
+            # annual_fee_to_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token, ids=ids)
+            # sleep(10)
+
+            # 模式二
+            for id in ids:
+                annual_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token, id=id)
 
 
 main = tkinter.Tk()
@@ -111,15 +124,10 @@ password.place(x=22, y=102, width=50, height=20)
 password_frame = tkinter.Entry(main, show='*', width=20)
 password_frame.place(x=112, y=102, width=120, height=23)
 
-
-def ss():
-    print(condition.get())
-
-
 # 勾选框
-condition = tkinter.StringVar()
-condition.set('0')
-Checkbutton = tkinter.Checkbutton(main, text='显示浏览器窗口', font=('宋体', 8), variable=condition, onvalue=1, offvalue=0, command=ss)
+condition = tkinter.IntVar()
+condition.set(0)
+Checkbutton = tkinter.Checkbutton(main, text='显示浏览器窗口', font=('宋体', 8), variable=condition, onvalue=1, offvalue=0)
 Checkbutton.place(x=35, y=140)
 
 # 状态更新

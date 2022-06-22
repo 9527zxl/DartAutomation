@@ -1,9 +1,13 @@
+import os
 import sys
 import tkinter
 import tkinter.messagebox
 
-
 # 退出程序
+from utils.commonUtils import login_get_cookies
+from utils.driverUtils import FirefoxDriver
+
+
 def quitGui():
     sys.exit()
 
@@ -17,9 +21,8 @@ def loginGui():
     elif account_input.get() != '' and password_input.get() != '':
         tkinter.messagebox.showinfo(title='登录中。。。', message='请耐心等待')
         # 登录飞镖网后台
-        # driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe')
-        # login_return = login_get_cookies(driver, username=account_input.get(), password=password_input.get())
-        login_return = '登录成功'
+        driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe', state=True)
+        login_return = login_get_cookies(driver, username=account_input.get(), password=password_input.get())
         if login_return == '登录成功':
             window.destroy()  # 关闭登录窗口
             from tkinter_main import Annual_update_button

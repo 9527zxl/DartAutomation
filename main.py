@@ -8,7 +8,6 @@ from utils.commonUtils import gain_feibiao_cookie, login_get_cookies
 from utils.driverUtils import FirefoxDriver
 from utils.requestsUtils import get_patent_number, patent_update, update_successfully, get_acquisition_patent_Number
 
-
 # def main(driver, feibiaoCookie):
 #     # # 登录查询网站
 #     # sleep_state = True
@@ -39,9 +38,9 @@ from utils.requestsUtils import get_patent_number, patent_update, update_success
 
 
 if __name__ == '__main__':
-    # driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe')
+    driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe', state=False)
     # 登录飞镖网
-    # login_get_cookies(driver, username='zhuxingli', password='zhuxingli')
+    login_get_cookies(driver, username='zhuxingli', password='zhuxingli')
     # 获取飞镖cookie
     feibiao_cookie = gain_feibiao_cookie()
     # main(driver=driver, feibiaoCookie=feibiao_cookie)
@@ -56,4 +55,4 @@ if __name__ == '__main__':
     # patent_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token)
     # print('更新完成')
 
-    get_acquisition_patent_Number(feibiao_cookie=feibiao_cookie,state=False)
+    # get_acquisition_patent_Number(feibiao_cookie=feibiao_cookie,state=False)

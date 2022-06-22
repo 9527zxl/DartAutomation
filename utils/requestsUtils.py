@@ -24,7 +24,7 @@ def patent_update(feibiao_cookie, update_cookie, update_token):
     requests.post(url=patent_update_url, params=param, headers=headers)
 
 
-# 年费采集更新
+# 年费采集更新(模式一)   容易搞坏网站
 def annual_fee_to_update(feibiao_cookie, update_cookie, update_token, ids):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36 Edg/98.0.1108.62',
@@ -41,14 +41,33 @@ def annual_fee_to_update(feibiao_cookie, update_cookie, update_token, ids):
             'port': '16819',
             'cookie': update_cookie
         }
-        req = grequests.request('post', url=gather_url, params=param, headers=headers)
+        req = grequests.request('post', url=gather_url, data=param, headers=headers)
         urls.append(req)
 
     # 高并发，size控制并发数
-    resp = grequests.map(urls, size=15)
+    resp = grequests.map(urls, size=30)
 
     for wold in resp:
-        print(wold.text)
+        print(wold)
+
+
+# 年费采集更新(模式二)   速度太慢(一小时400条左右)
+def annual_update(feibiao_cookie, update_cookie, update_token, id):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36 Edg/98.0.1108.62',
+        'Cookie': feibiao_cookie
+    }
+    param = {
+        'id': id,
+        'token': update_token,
+        'host': '49.7.96.252',
+        'port': '16819',
+        'cookie': update_cookie
+    }
+    gather_url = 'http://www.ipfeibiao.com/manager/patentUpdateAnnualfee/getAnnualFeeById'
+
+    response = requests.post(url=gather_url, params=param, headers=headers)
+    print(response.text)
 
 
 # 获取年费状态更新专利号
@@ -92,7 +111,11 @@ def get_acquisition_patent_Number(feibiao_cookie, state):
     response = requests.post(url=url, params=param, headers=headers)
     data = response.json()
     # 随机20条数据
-    list_data = random.sample(data['data'], 15)
+    list_data = []
+    try:
+        list_data = random.sample(data['data'], 30)
+    except ValueError:
+        print('请手动更新！')
 
     # 专利年费采集更新数量
     annual_fee_quantity = data['count']
