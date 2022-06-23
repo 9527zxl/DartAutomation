@@ -45,7 +45,7 @@ def annual_fee_to_update(feibiao_cookie, update_cookie, update_token, ids):
         urls.append(req)
 
     # 高并发，size控制并发数
-    resp = grequests.map(urls, size=30)
+    resp = grequests.map(urls, size=20)
 
     for wold in resp:
         print(wold)
@@ -113,7 +113,7 @@ def get_acquisition_patent_Number(feibiao_cookie, state):
     # 随机20条数据
     list_data = []
     try:
-        list_data = random.sample(data['data'], 30)
+        list_data = random.sample(data['data'], 20)
     except ValueError:
         print('请手动更新！')
 

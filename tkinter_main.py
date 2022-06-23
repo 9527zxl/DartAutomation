@@ -27,7 +27,6 @@ def Annual_status_update():
         # 获取飞镖cookie
         feibiao_cookie = gain_feibiao_cookie()
         # 登录查询网站
-        sleep_state = True
         login_cnipa(driver, username=account_frame.get(), password=password_frame.get())
         while True:
             update_number1 = update_successfully(feibiao_cookie=feibiao_cookie)
@@ -53,14 +52,13 @@ def Annual_status_update():
             # 年费状态更新
             patent_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token)
 
-            while sleep_state:
+            while True:
                 sleep(30)
                 update_number2 = update_successfully(feibiao_cookie=feibiao_cookie)
                 print('update_number1=' + str(update_number1))
                 print('update_number2=' + str(update_number2))
                 print('等待中。。。')
                 if update_number1 < update_number2:
-                    sleep_state = False
                     break
 
 
@@ -82,7 +80,10 @@ def Annual_update_button():
             # 获取专利号
             patent_number = random.choice(get_acquisition_patent_Number(feibiao_cookie, state=False))
             # 获取token
-            token = gain_cnipa_cookies(driver, patent_number=patent_number)
+            try:
+                token = gain_cnipa_cookies(driver, patent_number=patent_number)
+            except Exception:
+                token = gain_cnipa_cookies(driver, patent_number=patent_number)
             if token == '查询次数已经耗尽':
                 state = False
                 tkinter.messagebox.showinfo(title='error', message='查询次数已经耗尽!')
