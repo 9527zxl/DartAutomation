@@ -18,16 +18,20 @@ on_state = True
 # 年费状态更新按钮
 def Annual_status_update():
     if account_frame.get() == '':
-        tkinter.messagebox.showerror(title='error', message='账号不能为空!')
+        tkinter.messagebox.showerror(title='错误', message='账号不能为空!')
     elif password_frame.get() == '':
-        tkinter.messagebox.showerror(title='error', message='密码不能为空!')
+        tkinter.messagebox.showerror(title='错误', message='密码不能为空!')
     elif account_frame.get() != '' and password_frame.get() != '':
         driver = FirefoxDriver(path=os.path.abspath(os.curdir) + '\driver\geckodriver.exe',
                                state=False if condition.get() == 1 else on_state)
         # 获取飞镖cookie
         feibiao_cookie = gain_feibiao_cookie()
         # 登录查询网站
-        login_cnipa(driver, username=account_frame.get(), password=password_frame.get())
+        mistake = login_cnipa(driver, username=account_frame.get(), password=password_frame.get())
+        # 账号密码错误处理
+        if mistake == '用户名或密码不正确！':
+            driver.quit()
+            tkinter.messagebox.showerror(title='错误', message='用户名或密码不正确！')
         while True:
             update_number1 = update_successfully(feibiao_cookie=feibiao_cookie)
             # 获取年费状态更新账号以及捕获异常
@@ -40,7 +44,8 @@ def Annual_status_update():
                 driver.quit()
                 break
             # 获取更新
-            token = gain_cnipa_cookies(driver, patent_number=patent_number)
+            token = gain_cnipa_cookies(driver, patent_number=patent_number, username=account_frame.get(),
+                                       password=password_frame.get())
             if token == '查询次数已经耗尽':
                 driver.quit()
                 tkinter.messagebox.showinfo(title='error', message='查询次数已经耗尽!')
@@ -74,16 +79,22 @@ def Annual_update_button():
         # 获取飞镖网cookie
         feibiao_cookie = gain_feibiao_cookie()
         # 登录查询网站
-        login_cnipa(driver, username=account_frame.get(), password=password_frame.get())
+        mistake = login_cnipa(driver, username=account_frame.get(), password=password_frame.get())
+        # 账号密码错误处理
+        if mistake == '用户名或密码不正确！':
+            driver.quit()
+            tkinter.messagebox.showerror(title='错误', message='用户名或密码不正确！')
         state = True
         while state:
             # 获取专利号
             patent_number = random.choice(get_acquisition_patent_Number(feibiao_cookie, state=False))
             # 获取token
             try:
-                token = gain_cnipa_cookies(driver, patent_number=patent_number)
+                token = gain_cnipa_cookies(driver, patent_number=patent_number, username=account_frame.get(),
+                                           password=password_frame.get())
             except Exception:
-                token = gain_cnipa_cookies(driver, patent_number=patent_number)
+                token = gain_cnipa_cookies(driver, patent_number=patent_number, username=account_frame.get(),
+                                           password=password_frame.get())
             if token == '查询次数已经耗尽':
                 state = False
                 tkinter.messagebox.showinfo(title='error', message='查询次数已经耗尽!')
@@ -93,12 +104,12 @@ def Annual_update_button():
             # 获取id
             ids = get_acquisition_patent_Number(feibiao_cookie, state=True)
             # 更新 模式一
-            # annual_fee_to_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token, ids=ids)
-            # sleep(10)
+            annual_fee_to_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token, ids=ids)
+            sleep(60)
 
             # 模式二
-            for id in ids:
-                annual_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token, id=id)
+            # for id in ids:
+            #     annual_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token, id=id)
 
 
 main = tkinter.Tk()

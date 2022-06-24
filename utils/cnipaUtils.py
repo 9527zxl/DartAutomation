@@ -15,11 +15,11 @@ def login_cnipa(driver, username, password):
     :param password: 查询网站密码
     """
     driver.get('http://cpquery.cnipa.gov.cn/')
+    driver.refresh()
     # 全局等待
     # driver.implicitly_wait(10)
     # 窗口最大化
     driver.maximize_window()
-    driver.refresh()
 
     # 等待元素加载完成
     explicitWaiting(driver, 20, xpath='//input[@id="username1"]')
@@ -58,14 +58,21 @@ def login_cnipa(driver, username, password):
     else:
         element = driver.find_element(By.XPATH, '//input[@id="publiclogin"]')
         driver.execute_script("arguments[0].click();", element)
+        # 处理账号或密码错误
+        if element_exist(driver, time=5, xpath_path='//span[@class="noty_text"]'):
+            return '用户名或密码不正确！'
     # 等待登录加载完成
     WebDriverWait(driver, 40).until(EC.text_to_be_present_in_element((By.XPATH, '//*[@class="tittle_box"]'), '使用声明'))
 
 
 # 获取所查询专利号的cookie和token
-def gain_cnipa_cookies(driver, patent_number):
+def gain_cnipa_cookies(driver, patent_number, username, password):
     # 进入查询页面
     driver.get('http://cpquery.cnipa.gov.cn/txnPantentInfoList.do?')
+    # 防止cookies失效导致返回登录界面
+    if element_exist(driver=driver, time=5, xpath_path='//*[@id="slogo"]'):
+        login_cnipa(driver, username=username, password=password)
+        gain_cnipa_cookies(driver, patent_number, username, password)
     # 等待元素加载完成
     explicitWaiting(driver, 20, xpath='//*[@class="tab_top_on"]/p')
     # 等待计算验证码加载完成

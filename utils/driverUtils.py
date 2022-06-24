@@ -12,5 +12,7 @@ def FirefoxDriver(path, state):
     options = FirefoxOptions()
     if state:
         options.add_argument('--headless')  # 无头浏览器
+    # 页面加载策略
+    options.page_load_strategy = 'eager'
     driver_path = path
     return Firefox(executable_path=driver_path, options=options)
