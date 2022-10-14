@@ -123,7 +123,7 @@ def verification_code(driver, image_location):
                 try:
                     ActionChains(driver).move_to_element_with_offset(location_code, coord_id['X'],
                                                                      coord_id['Y']).click().perform()
-                    sleep(0.5)
+                    sleep(1)
                 except Exception:
                     pass
 

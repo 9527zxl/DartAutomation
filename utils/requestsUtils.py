@@ -1,4 +1,5 @@
 import random
+from time import sleep
 
 import grequests
 import requests
@@ -28,7 +29,7 @@ def patent_update(feibiao_cookie, update_cookie, update_token):
 def annual_fee_to_update(feibiao_cookie, update_cookie, update_token, ids):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36 Edg/98.0.1108.62',
-        'Cookie': feibiao_cookie
+        'Cookie': feibiao_cookie,
     }
     gather_url = 'http://www.ipfeibiao.com/manager/patentUpdateAnnualfee/getAnnualFeeById'
 
@@ -44,11 +45,15 @@ def annual_fee_to_update(feibiao_cookie, update_cookie, update_token, ids):
         req = grequests.request('post', url=gather_url, data=param, headers=headers)
         urls.append(req)
 
-    # 高并发，size控制并发数
-    resp = grequests.map(urls, size=30)
+        if len(urls) == 20:
+            resp = grequests.map(urls, size=10)
+            for wold in resp:
+                print(wold)
 
-    for wold in resp:
-        print(wold)
+    # 高并发，size控制并发数
+    # resp = grequests.map(urls, size=20)
+    # for wold in resp:
+    #     print(wold)
 
 
 # 年费采集更新(模式二)   速度太慢(一小时400条左右)
@@ -77,8 +82,8 @@ def get_patent_number(feibiao_cookie):
         'Cookie': feibiao_cookie
     }
     param = {
-        'page': 1,
-        'limit': 200
+        'page': 11,
+        'limit': 20
     }
     url = 'http://www.ipfeibiao.com/manager/patentUpdateAnnualState/list'
 
@@ -102,8 +107,8 @@ def get_acquisition_patent_Number(feibiao_cookie, state):
         'Cookie': feibiao_cookie
     }
     param = {
-        'page': 1,
-        'limit': 200,
+        'page': 11,
+        'limit': 20,
         'collection_state': 1
     }
     url = 'http://www.ipfeibiao.com/manager/patentUpdateAnnualfee/list'
@@ -113,7 +118,7 @@ def get_acquisition_patent_Number(feibiao_cookie, state):
     # 随机30条数据
     list_data = []
     try:
-        list_data = random.sample(data['data'], 30)
+        list_data = random.sample(data['data'], 20)
     except ValueError:
         print('请手动更新！')
 

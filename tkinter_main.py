@@ -6,7 +6,7 @@ from tkinter import HORIZONTAL, X
 from tkinter.ttk import Separator
 import tkinter.messagebox
 
-from utils.cnipaUtils import login_cnipa, gain_cnipa_cookies, get_cookies
+from utils.cnipaUtils import login_cnipa, gain_cnipa_cookies, get_cookies, get_gather_cookies
 from utils.commonUtils import gain_feibiao_cookie
 from utils.driverUtils import FirefoxDriver
 from utils.requestsUtils import get_acquisition_patent_Number, annual_fee_to_update, get_patent_number, \
@@ -100,16 +100,21 @@ def Annual_update_button():
                 tkinter.messagebox.showinfo(title='error', message='查询次数已经耗尽!')
                 continue
             # 获取cookie
-            cookie = get_cookies()
+            cookie = get_gather_cookies()
             # 获取id
             ids = get_acquisition_patent_Number(feibiao_cookie, state=True)
             # 更新 模式一
             annual_fee_to_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token, ids=ids)
-            sleep(60)
+            sleep(10)
 
             # 模式二
             # for id in ids:
             #     annual_update(feibiao_cookie=feibiao_cookie, update_cookie=cookie, update_token=token, id=id)
+
+            # 手动打印cookietoken
+            # print(token)
+            # print(cookie)
+            # input()
 
 
 main = tkinter.Tk()

@@ -74,7 +74,7 @@ def gain_cnipa_cookies(driver, patent_number, username, password):
         login_cnipa(driver, username=username, password=password)
         gain_cnipa_cookies(driver, patent_number, username, password)
     # 等待元素加载完成
-    explicitWaiting(driver, 20, xpath='//*[@class="tab_top_on"]/p')
+    # explicitWaiting(driver, 20, xpath='//*[@class="tab_top_on"]/p')
     # 等待计算验证码加载完成
     explicitWaiting(driver, 20, xpath='//*[@id="authImg"]')
     # 获取计算验证码结果并处理验证码发生错误
@@ -86,6 +86,10 @@ def gain_cnipa_cookies(driver, patent_number, username, password):
     # 请求输入过专利号和验证码页面
     driver.get('http://cpquery.cnipa.gov.cn/txnQueryOrdinaryPatents.do?select-key:shenqingh=' + (str(
         patent_number)).replace(' ', '') + '&verycode=' + str(code))
+    # 防止cookies失效导致返回登录界面
+    if element_exist(driver=driver, time=5, xpath_path='//*[@id="slogo"]'):
+        login_cnipa(driver, username=username, password=password)
+        gain_cnipa_cookies(driver, patent_number, username, password)
     # 处理查询次数使用完了的场景
     if element_exist(driver=driver, xpath_path='//*[@class="binding"]/img', time=0):
         driver.quit()
@@ -121,5 +125,22 @@ def get_cookies():
         cookies_list = json.load(f)
         for cookies in cookies_list:
             cookie += cookies['name'] + '=' + cookies['value'] + ';'
+
+    return cookie
+
+
+# 获取专利年费采集cookie
+def get_gather_cookies():
+    cookie = ''
+    with open('./tempFiles/cookies.json', 'r') as f:
+        cookies_list = json.load(f)
+
+        for cookies in cookies_list:
+            if cookies['name'] == 'UR3ZMlLdcLIES' or cookies['name'] == 'bg78' or cookies['name'] == 'UR3ZMlLdcLIET':
+                cookie += cookies['name'] + '=' + cookies['value'] + '; '
+
+        for cookies in cookies_list:
+            if cookies['name'] == 'JSESSIONID':
+                cookie = cookie + cookies['name'] + '=' + cookies['value']
 
     return cookie

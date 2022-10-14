@@ -10,8 +10,8 @@ def FirefoxDriver(path, state):
     """
     # 火狐浏览器驱动
     options = FirefoxOptions()
-    if state:
-        options.add_argument('--headless')  # 无头浏览器
+    # if state:
+    #     options.add_argument('--headless')  # 无头浏览器
     # 页面加载策略
     options.page_load_strategy = 'eager'
     driver_path = path
