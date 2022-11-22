@@ -2,12 +2,10 @@ import os
 import sys
 import tkinter
 import tkinter.messagebox
-
-# 退出程序
 from utils.commonUtils import login_get_cookies
 from utils.driverUtils import FirefoxDriver
 
-
+# 退出程序
 def quitGui():
     sys.exit()
 
